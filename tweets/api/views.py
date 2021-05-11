@@ -43,6 +43,9 @@ class TweetViewSet(viewsets.GenericViewSet,
         """
         if 'user_id' not in request.query_params:
             return Response('missing user_id', status=400)
+        print(Tweet.objects.filter(
+            user_id=request.query_params['user_id']
+        ).order_by('-created_at').query)
         tweets = Tweet.objects.filter(
             user_id=request.query_params['user_id']
         ).order_by('-created_at')
