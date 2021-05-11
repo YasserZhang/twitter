@@ -6,7 +6,7 @@ import re
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ('id','username', 'email')
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -16,7 +16,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ('username', 'email', 'password')
 
     def validate(self, data):
         username_pattern = re.compile(r'^[\w]+$')
@@ -53,4 +53,4 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ('username', 'password')
