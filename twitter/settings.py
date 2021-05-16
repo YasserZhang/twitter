@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
     'tweets',
+    'friendships',
+    'newsfeeds',
 ]
 
 MIDDLEWARE = [
