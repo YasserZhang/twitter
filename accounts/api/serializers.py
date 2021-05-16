@@ -6,7 +6,7 @@ import re
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('id','username', 'email')
+        fields = ('id', 'username', 'email')
 
 
 class SignupSerializer(serializers.ModelSerializer):

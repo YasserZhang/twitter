@@ -13,7 +13,7 @@ class FriendshipTestCase(TestCase):
 
     def setUp(self):
         self.anonymous_client = APIClient()
-        self.user_a = self.create_user  ('user_a')
+        self.user_a = self.create_user('user_a')
         self.user_a_client = APIClient()
         self.user_a_client.force_authenticate(self.user_a)
 
