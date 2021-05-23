@@ -5,6 +5,8 @@ from tweets.models import Tweet
 
 TWEET_LIST_API = '/api/tweets/'
 TWEET_CREATE_API = '/api/tweets/'
+
+
 class TweetApiTests(TestCase):
 
     def setUp(self):
