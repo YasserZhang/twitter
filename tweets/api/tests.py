@@ -59,3 +59,12 @@ class TweetApiTests(TestCase):
         self.assertEqual(response.data['user']['id'], self.user1.id)
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
 
+    def test_retrieve(self):
+        tweet = self.create_tweet(self.user1)
+        self.create_comment(self.user2, tweet.id)
+
+        response = self.anonymous_client.get('{}{}/'.format(TWEET_LIST_API, tweet.id))
+        print(response)
+        self.assertEqual(response.status_code, 200)
+
+
