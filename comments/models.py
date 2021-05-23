@@ -13,7 +13,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        index_together = (('tweet', 'created_at'))
+        index_together = (('tweet', 'created_at'),)
 
     def __str__(self):
         return '{} - {} says {} at tweet {}'.format(
