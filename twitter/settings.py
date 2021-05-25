@@ -14,7 +14,7 @@ from pathlib import Path
 
 try:
     from .local_settings import *
-except:
+except Exception as e:
     pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'newsfeeds',
     'comments',
     'django_filters',
+    'likes',
 ]
 
 MIDDLEWARE = [

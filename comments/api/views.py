@@ -68,5 +68,5 @@ class CommentViewSet(viewsets.GenericViewSet):
             {
                 'comments': serializer.data,
             },
-            status=status.HTTP_301
+            status=status.HTTP_200_OK
         )

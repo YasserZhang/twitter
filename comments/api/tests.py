@@ -126,3 +126,14 @@ class CommentTestCase(TestCase):
             'user_id': self.user_a.id,
         })
         self.assertEqual(len(response.data['comments']), 2)
+
+    def test_like_set(self):
+        self.create_like(self.user_b, self.tweet)
+        self.assertEqual(self.tweet.like_set.count(), 1)
+
+        self.create_like(self.user_b, self.tweet)
+        self.assertEqual(self.tweet.like_set.count(), 1)
+
+        new_user = self.create_user('user_c')
+        self.create_like(new_user, self.tweet)
+        self.assertEqual(self.tweet.like_set.count(), 2)
