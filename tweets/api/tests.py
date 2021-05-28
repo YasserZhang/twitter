@@ -54,8 +54,31 @@ class TweetApiTests(TestCase):
         response = self.user1_client.post(TWEET_CREATE_API, {
             'content': 'Hello World, this is my first tweet!'
         })
-        print(response)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['user']['id'], self.user1.id)
         self.assertEqual(Tweet.objects.count(), tweets_count + 1)
 
+    def test_retrieve(self):
+        tweet = self.create_tweet(self.user1)
+        self.create_comment(self.user2, tweet.id)
+
+        response = self.anonymous_client.get('{}{}/'.format(TWEET_LIST_API, tweet.id))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.anonymous_client.get('{}{}/?with_all_comments'.format(TWEET_LIST_API, tweet.id))
+        print(response.status_code)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['comments']),1)
+
+    def test_like_set(self):
+        tweet = self.create_tweet(self.user1)
+        self.create_like(self.user2, tweet)
+        self.assertEqual(tweet.like_set.count(), 1)
+
+        self.create_like(self.user2, tweet)
+        self.assertEqual(tweet.like_set.count(), 1)
+
+        new_user = self.create_user('new_user')
+        self.create_like(new_user, tweet)
+        self.assertEqual(tweet.like_set.count(), 2)
