@@ -49,7 +49,7 @@ class TweetViewSet(viewsets.GenericViewSet,
         tweets = Tweet.objects.filter(
             user_id=request.query_params['user_id']
         ).order_by('-created_at')
-        serializer = TweetSerializer(tweets, many=True)
+        serializer = TweetSerializer(tweets, context={'request': request}, many=True)
         return Response({'tweets': serializer.data})
 
     def retrieve(self, request, *args, **kwargs):
@@ -58,4 +58,4 @@ class TweetViewSet(viewsets.GenericViewSet,
             return Response(TweetSerializerWithComments(tweet).data)
         if 'with_preview_comments' in request.query_params:
             return Response(TweetSerializerWithComments(tweet))
-        return Response(TweetSerializer(tweet).data)
+        return Response(TweetSerializer(tweet, context={'request': request}).data)

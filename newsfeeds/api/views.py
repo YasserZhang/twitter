@@ -22,7 +22,10 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         print(request.user)
         #followers = Friendship.objects.filter(to_user=request.user['id'])
         newsfeeds = NewsFeed.objects.filter(user=request.user)
-        serializer = NewsFeedSerializer(newsfeeds, many=True)
+        serializer = NewsFeedSerializer(
+            newsfeeds,
+            context={'context': request},
+            many=True)
         return Response(
             {
              'newsfeeds': serializer.data,
