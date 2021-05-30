@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'comments',
     'django_filters',
     'likes',
+    'notifications',
 ]
 
 MIDDLEWARE = [
