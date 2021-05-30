@@ -5,6 +5,8 @@ from rest_framework.test import APIClient
 
 from comments.models import Comment
 from likes.models import Like
+from newsfeeds.models import NewsFeed
+from newsfeeds.services import NewsFeedService
 from tweets.models import Tweet
 
 
@@ -28,7 +30,9 @@ class TestCase(DjangoTestCase):
     def create_tweet(self, user, content=None):
         if content is None:
             content = 'default tweet content'
-        return Tweet.objects.create(user=user, content=content)
+        tweet = Tweet.objects.create(user=user, content=content)
+        NewsFeedService.fanout_to_followers(tweet)
+        return tweet
 
     def create_comment(self, user, tweet_id, content=None):
         if content is None:
@@ -42,3 +46,6 @@ class TestCase(DjangoTestCase):
             user=user,
         )
         return instance
+
+    def create_newsfeed(self, user, tweet):
+        return NewsFeed.objects.create(user=user, tweet=tweet)

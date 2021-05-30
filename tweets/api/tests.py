@@ -66,8 +66,6 @@ class TweetApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.anonymous_client.get('{}{}/?with_all_comments'.format(TWEET_LIST_API, tweet.id))
-        print(response.status_code)
-        print(response.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['comments']),1)
 
