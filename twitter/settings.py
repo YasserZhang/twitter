@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import sys
 
 try:
     from .local_settings import *
@@ -25,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '*9y$+r!xae=#k^6$mrbxhnpzcd8_x$ea!)9bxkgt0^57m$*ogj'
+SECRET_KEY = DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'comments',
     'django_filters',
     'likes',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -93,7 +95,7 @@ DATABASES = {
         'HOST': '0.0.0.0',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'yourpassword'
+        'PASSWORD': MYSQL_PASSWORD
     }
 }
 
@@ -135,6 +137,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+TESTING = ((" ".join(sys.argv)).find('manage.py test') != -1)
+if TESTING:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+AWS_STORAGE_BUCKET_NAME = 'yaseru-twitter-userprofile-images'
+AWS_S3_REGION_NAME = 'us-east-2'
+
+# when at local testing, images are stored at MEDIA_ROOT
+MEDIA_ROOT = 'media/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
