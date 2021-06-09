@@ -9,6 +9,7 @@ UNREAD_URL = '/api/notifications/unread-count/'
 MARK_AS_READ_URL = '/api/notifications/mark-all-as-read/'
 NOTIFICATION_UPDATE_URL = '/api/notifications/{}/'
 
+
 class NotificationTests(TestCase):
 
     def setUp(self):
@@ -30,6 +31,7 @@ class NotificationTests(TestCase):
             'object_id': self.tweet.id,
         })
         self.assertEqual(Notification.objects.count(), 1)
+
 
 class NotificationApiTest(TestCase):
 
