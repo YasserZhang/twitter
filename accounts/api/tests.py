@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
-
+from testing.testcases import TestCase
 
 LOGIN_URL = '/api/accounts/login/'
 LOGIN_STATUS_URL = '/api/accounts/login_status/'
 LOGOUT_URL = '/api/accounts/logout/'
 SIGNUP_URL = '/api/accounts/signup/'
-
+USER_PROFILE_DETAIL_URL = '/api/profiles/{}/'
 
 def create_user(username, email, password):
     return User.objects.create_user(username, email, password)
@@ -114,3 +114,42 @@ class AccountApiTests(TestCase):
         self.assertEqual(response.data['user']['username'], 'someone')
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
+
+
+class UserProfileAPITests(TestCase):
+
+    def test_update(self):
+        p = self.user_a.profile
+        p.nickname = 'old nickname'
+        p.save()
+        url = USER_PROFILE_DETAIL_URL.format(p.id)
+
+        # other client not allowed to update your user profile
+        response = self.user_b_client.put(url, {
+            'nickname': 'new nickname',
+        })
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data['detail'], 'You do not have permission to access this object')
+        p.refresh_from_db()
+        self.assertEqual(p.nickname, 'old nickname')
+
+        # update user profile successfully
+        response = self.user_a_client.put(url, {
+            'nickname': 'new nickname',
+        })
+        self.assertEqual(response.status_code, 200)
+        p.refresh_from_db()
+        self.assertEqual(p.nickname, 'new nickname')
+
+        # update avatar
+        response = self.user_a_client.put(url, {
+            'avatar': SimpleUploadedFile(
+                name='my-avatar.jpg',
+                content=str.encode('a fake image'),
+                content_type = 'image/jpeg',
+            ),
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual('my-avatar' in response.data['avatar'], True)
+        p.refresh_from_db()
+        self.assertIsNotNone(p.avatar)

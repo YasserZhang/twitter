@@ -12,6 +12,7 @@ from django.contrib.auth import (
 )
 
 from accounts.models import UserProfile
+from comments.api.permissions import IsObjectOwner
 
 """
 dir(request)
@@ -64,7 +65,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         return Response({
             "success": True,
             "user": UserSerializer(user).data,
-        })
+        }, status=201)
 
     @action(methods=['GET'], detail=False)
     def login_status(self, request):
@@ -110,5 +111,5 @@ class AccountViewSet(viewsets.ModelViewSet):
 
 class UserProfileViewSet(viewsets.GenericViewSet, viewsets.mixins.UpdateModelMixin):
     queryset = UserProfile
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, IsObjectOwner)
     serializer_class = UserProfileSerializerForUpdate
