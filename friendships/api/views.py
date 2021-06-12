@@ -4,6 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
+from friendships.api.paginations import FriendshipPagination
 from friendships.api.serializers import FollowingSerializer, FriendshipSerializerForCreate, FollowerSerializer
 from friendships.models import Friendship
 
@@ -12,23 +13,22 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = FriendshipSerializerForCreate
     # authentication_classes = [IsAuthenticated()]
+    pagination_class = FriendshipPagination
 
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followings(self, request, pk):
         print(Friendship.objects.filter(from_user_id=pk).order_by('-created_at').query)
         friendships = Friendship.objects.filter(from_user_id=pk).order_by('-created_at')
-        serializer = FollowingSerializer(friendships, many=True)
-        return Response({
-            'followings': serializer.data,
-        })
+        page = self.paginate_queryset(friendships)
+        serializer = FollowingSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followers(self, request, pk):
         friendships = Friendship.objects.filter(to_user_id=pk).order_by('-created_at')
-        serializer = FollowerSerializer(friendships, many=True)
-        return Response({
-            'followers': serializer.data,
-        })
+        page = self.paginate_queryset(friendships)
+        serializer = FollowingSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def follow(self, request, pk):
