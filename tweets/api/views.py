@@ -26,7 +26,6 @@ class TweetViewSet(viewsets.GenericViewSet,
         """
         reload create method, because need to use request.user as tweet user
         """
-        print("creating a tweet... ")
         serializer = TweetSerializerForCreate(
             data=request.data,
             context={'request': request},
