@@ -99,14 +99,14 @@ class LikeApiTest(TestCase):
         self.create_comment(self.user_a, tweet.id)
         response = self.user_b_client.get(TWEET_LIST_API, {'user_id': self.user_a.id})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['tweets'][0]['comments_count'], 1)
+        self.assertEqual(response.data['results'][0]['comments_count'], 1)
 
         # test newsfeeds list api
         self.create_comment(self.user_b, tweet.id)
         self.create_newsfeed(self.user_b, tweet)
         response = self.user_b_client.get(NEWSFEED_LIST_API)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['newsfeeds'][0]['tweet']['comments_count'], 2)
+        self.assertEqual(response.data['results'][0]['tweet']['comments_count'], 2)
 
     def test_likes_in_tweets_api(self):
         # user_b follows user_a
@@ -129,15 +129,15 @@ class LikeApiTest(TestCase):
         # user_a self likes the tweet
         self.user_a_client.post(LIKE_BASE_URL, data)
         response = self.user_a_client.get(TWEET_LIST_API, {'user_id': self.user_a.id})
-        self.assertEqual(response.data['tweets'][0]['has_liked'], True)
-        self.assertEqual(response.data['tweets'][0]['likes_count'], 2)
+        self.assertEqual(response.data['results'][0]['has_liked'], True)
+        self.assertEqual(response.data['results'][0]['likes_count'], 2)
 
         # user_b get newsfeed
         response = self.user_b_client.get(NEWSFEED_LIST_API)
         self.assertEqual(response.status_code, 200)
         print(response.data)
-        self.assertEqual(response.data['newsfeeds'][0]['tweet']['has_liked'], True)
-        self.assertEqual(response.data['newsfeeds'][0]['tweet']['likes_count'], 2)
+        self.assertEqual(response.data['results'][0]['tweet']['has_liked'], True)
+        self.assertEqual(response.data['results'][0]['tweet']['likes_count'], 2)
 
     def test_likes_in_comments_api(self):
         tweet = self.create_tweet(self.user_a)
