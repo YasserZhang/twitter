@@ -28,12 +28,12 @@ class TweetApiTests(TestCase):
 
         response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['tweets']), 3)
+        self.assertEqual(len(response.data['results']), 3)
         response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user2.id})
-        self.assertEqual(len(response.data['tweets']), 2)
+        self.assertEqual(len(response.data['results']), 2)
         # check the tweets are ordered by created_at desc
-        self.assertEqual(response.data['tweets'][0]['id'], self.tweets2[1].id)
-        self.assertEqual(response.data['tweets'][1]['id'], self.tweets2[0].id)
+        self.assertEqual(response.data['results'][0]['id'], self.tweets2[1].id)
+        self.assertEqual(response.data['results'][1]['id'], self.tweets2[0].id)
 
     def test_create_api(self):
         response = self.anonymous_client.post(TWEET_CREATE_API)
@@ -155,10 +155,10 @@ class TweetApiTests(TestCase):
 
         response = self.user1_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
         self.assertEqual(response.data['has_next_page'], True)
-        self.assertEqual(len(response.data['tweets']), page_size)
-        self.assertEqual(response.data['tweets'][0]['id'], tweets[0].id)
-        self.assertEqual(response.data['tweets'][1]['id'], tweets[1].id)
-        self.assertEqual(response.data['tweets'][page_size - 1]['id'], tweets[page_size - 1].id)
+        self.assertEqual(len(response.data['results']), page_size)
+        self.assertEqual(response.data['results'][0]['id'], tweets[0].id)
+        self.assertEqual(response.data['results'][1]['id'], tweets[1].id)
+        self.assertEqual(response.data['results'][page_size - 1]['id'], tweets[page_size - 1].id)
 
         # pull the second page
         response = self.user1_client.get(TWEET_LIST_API, {
@@ -166,10 +166,10 @@ class TweetApiTests(TestCase):
             'user_id': self.user1.id,
         })
         self.assertEqual(response.data['has_next_page'], False)
-        self.assertEqual(len(response.data['tweets']), page_size)
-        self.assertEqual(response.data['tweets'][0]['id'], tweets[page_size].id)
-        self.assertEqual(response.data['tweets'][1]['id'], tweets[page_size+1].id)
-        self.assertEqual(response.data['tweets'][page_size - 1]['id'], tweets[2 * page_size - 1].id)
+        self.assertEqual(len(response.data['results']), page_size)
+        self.assertEqual(response.data['results'][0]['id'], tweets[page_size].id)
+        self.assertEqual(response.data['results'][1]['id'], tweets[page_size+1].id)
+        self.assertEqual(response.data['results'][page_size - 1]['id'], tweets[2 * page_size - 1].id)
 
         # pull latest newsfeeds
         response = self.user1_client.get(TWEET_LIST_API, {
@@ -177,7 +177,7 @@ class TweetApiTests(TestCase):
             'user_id': self.user1.id,
         })
         self.assertEqual(response.data['has_next_page'], False)
-        self.assertEqual(len(response.data['tweets']), 0)
+        self.assertEqual(len(response.data['results']), 0)
 
         new_tweet = self.create_tweet(self.user1, 'a new tweet comes in')
 
@@ -186,6 +186,6 @@ class TweetApiTests(TestCase):
             'user_id': self.user1.id,
         })
         self.assertEqual(response.data['has_next_page'], False)
-        self.assertEqual(len(response.data['tweets']), 1)
-        self.assertEqual(response.data['tweets'][0]['id'], new_tweet.id)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['id'], new_tweet.id)
 

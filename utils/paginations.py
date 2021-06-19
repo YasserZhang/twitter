@@ -16,7 +16,7 @@ class EndlessPagination(BasePagination):
     def get_paginated_response(self, data):
         return Response({
             'has_next_page': self.has_next_page,
-            'tweets': data,
+            'results': data,
         })
 
     def paginate_queryset(self, queryset, request, view=None):
