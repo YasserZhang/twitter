@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from friendships.api.paginations import FriendshipPagination
 from friendships.api.serializers import FollowingSerializer, FriendshipSerializerForCreate, FollowerSerializer
 from friendships.models import Friendship
+from friendships.services import FriendshipService
 
 
 class FriendshipViewSet(viewsets.GenericViewSet):
@@ -27,7 +28,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     def followers(self, request, pk):
         friendships = Friendship.objects.filter(to_user_id=pk).order_by('-created_at')
         page = self.paginate_queryset(friendships)
-        serializer = FollowingSerializer(page, many=True, context={'request': request})
+        serializer = FollowerSerializer(page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
@@ -41,7 +42,8 @@ class FriendshipViewSet(viewsets.GenericViewSet):
         serializer = FriendshipSerializerForCreate(
             data={
                 'from_user_id': request.user.id,
-                'to_user_id': pk}
+                'to_user_id': pk
+            }
         )
         if not serializer.is_valid():
             return Response({
@@ -50,6 +52,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'errors': serializer.errors,
             }, 400)
         serializer.save()
+        FriendshipService.invalidate_following_cache(request.user.id)
         return Response({
             'success': True
         }, status=201)
@@ -62,6 +65,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'message': 'You can\'t unfollow yourself.'
             }, 400)
         deleted, _ = Friendship.objects.filter(from_user=request.user, to_user_id=pk).delete()
+        FriendshipService.invalidate_following_cache(request.user.id)
         return Response({
             'success': True,
             'deleted': deleted,
