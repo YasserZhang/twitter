@@ -4,6 +4,7 @@ from django.db import models
 # Create your models here.
 
 
+
 class Friendship(models.Model):
     from_user = models.ForeignKey(
         User,
@@ -28,3 +29,13 @@ class Friendship(models.Model):
 
     def __str__(self):
         return '{} followed {}'.format(self.from_user_id, self.to_user_id)
+
+    @property
+    def cached_from_user(self):
+        from accounts.services import UserService
+        return UserService.get_user_through_cache(self.from_user_id)
+
+    @property
+    def cached_to_user(self):
+        from accounts.services import UserService
+        return UserService.get_user_through_cache(self.to_user_id)

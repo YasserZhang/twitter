@@ -12,16 +12,7 @@ FOLLOWINGS_URL = '/api/friendships/{}/followings/'
 class FriendshipTestCase(TestCase):
 
     def setUp(self):
-        self.clear_cache()
-        self.anonymous_client = APIClient()
-        self.user_a = self.create_user('user_a')
-        self.user_a_client = APIClient()
-        self.user_a_client.force_authenticate(self.user_a)
-
-        self.user_b = self.create_user('user_b')
-        self.user_b_client = APIClient()
-        self.user_b_client.force_authenticate(self.user_b)
-
+        super().setUp()
         for i in range(2):
             follower = self.create_user('user_a_follower{}'.format(i))
             Friendship.objects.create(from_user=follower, to_user=self.user_a)
@@ -103,6 +94,7 @@ class FriendshipTestCase(TestCase):
         ts2 = response.data['results'][2]['created_at']
         self.assertEqual(ts0 > ts1, True)
         self.assertEqual(ts1 > ts2, True)
+        print("\n", response.data, "\n")
         self.assertEqual(
             response.data['results'][0]['user']['username'],
             'user_b_following2'
