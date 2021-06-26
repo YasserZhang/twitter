@@ -6,10 +6,6 @@ from testing.testcases import TestCase
 
 class FriendshipServiceTests(TestCase):
 
-    def setUp(self):
-        super().setUp()
-        self.clear_cache()
-
     def test_get_followings(self):
         user_c = self.create_user('user_c')
         user_d = self.create_user('user_d')

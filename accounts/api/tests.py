@@ -16,6 +16,7 @@ def create_user(username, email, password):
 class AccountApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.client = APIClient()
         self.user = create_user(
             username='admin',
