@@ -90,3 +90,25 @@ class NewsFeedTestCase(TestCase):
         self.assertEqual(response.data['has_next_page'], False)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['id'], new_newsfeed.id)
+
+    def test_tweet_cache(self):
+        tweet = self.create_tweet(self.user_a, 'content1')
+        self.create_newsfeed(self.user_b, tweet)
+        response = self.user_b_client.get(NEWSFEED_URL)
+        results = response.data['results']
+        self.assertEqual(results[0]['tweet']['user']['username'], 'user_a')
+        self.assertEqual(results[0]['tweet']['content'], 'content1')
+
+        # update username
+        self.user_a.username = 'new_user_a'
+        self.user_a.save()
+        response = self.user_b_client.get(NEWSFEED_URL)
+        results = response.data['results']
+        self.assertEqual(results[0]['tweet']['user']['username'], 'new_user_a')
+
+        # update content
+        tweet.content = 'content2'
+        tweet.save()
+        response = self.user_b_client.get(NEWSFEED_URL)
+        results = response.data['results']
+        self.assertEqual(results[0]['tweet']['content'], 'content2')
