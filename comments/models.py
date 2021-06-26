@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 # Create your models here.
-from accounts.services import UserService
+
 from likes.models import Like
 from tweets.models import Tweet
 
@@ -35,4 +35,5 @@ class Comment(models.Model):
 
     @property
     def cached_user(self):
+        from accounts.services import UserService
         return UserService.get_profile_through_cache(self.user_id)

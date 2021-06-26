@@ -1,15 +1,13 @@
+from accounts.models import UserProfile
 from django.conf import settings
 from django.core.cache import caches
-from rest_framework.authtoken.admin import User
-
-from accounts.models import UserProfile
+from django.contrib.auth.models import User
 from twitter.cache_constants import USER_PATTERN, USER_PROFILE_PATTERN
 
 cache = caches['testing'] if settings.TESTING else caches['default']
 
 
 class UserService:
-
     @classmethod
     def get_user_through_cache(cls, user_id):
         key = USER_PATTERN.format(user_id=user_id)

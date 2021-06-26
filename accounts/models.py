@@ -1,9 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
-from accounts.services import UserService
+
 # Create your models here.
 from django.db.models.signals import pre_delete, post_save
-
 from accounts.listeners import user_changed, profile_changed
 
 
@@ -19,7 +18,7 @@ class UserProfile(models.Model):
 
 
 def get_profile(user):
-
+    from accounts.services import UserService
     if hasattr(user, '_cached_user_profile'):
         return getattr(user, '_cached_user_profile')
     profile = UserService.get_profile_through_cache(user.id)

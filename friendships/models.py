@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
-from accounts.services import UserService
+
 
 
 class Friendship(models.Model):
@@ -31,8 +31,11 @@ class Friendship(models.Model):
         return '{} followed {}'.format(self.from_user_id, self.to_user_id)
 
     @property
-    def cache_from_user(self):
-        UserService.get_profile_through_cache(self.from_user_id)
+    def cached_from_user(self):
+        from accounts.services import UserService
+        return UserService.get_user_through_cache(self.from_user_id)
 
-    def cache_to_user(self):
-        UserService.get_profile_through_cache(self.to_user_id)
+    @property
+    def cached_to_user(self):
+        from accounts.services import UserService
+        return UserService.get_user_through_cache(self.to_user_id)

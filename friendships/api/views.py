@@ -52,7 +52,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'errors': serializer.errors,
             }, 400)
         serializer.save()
-        FriendshipService.invalidate_following_cache(request.user.id)
+        # FriendshipService.invalidate_following_cache(request.user.id)
         return Response({
             'success': True
         }, status=201)
@@ -65,7 +65,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'message': 'You can\'t unfollow yourself.'
             }, 400)
         deleted, _ = Friendship.objects.filter(from_user=request.user, to_user_id=pk).delete()
-        FriendshipService.invalidate_following_cache(request.user.id)
+        # FriendshipService.invalidate_following_cache(request.user.id)
         return Response({
             'success': True,
             'deleted': deleted,

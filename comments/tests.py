@@ -9,7 +9,7 @@ class CommentModelTests(TestCase):
     def setUp(self):
         super().setUp()
         self.tweet = self.create_tweet(self.user_a)
-        self.comment = self.create_comment(self.user_a, self.tweet)
+        self.comment = self.create_comment(self.user_a, self.tweet.id)
 
     def test_comment(self):
         self.assertNotEqual(self.comment.__str__(), None)

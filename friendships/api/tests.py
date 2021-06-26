@@ -94,6 +94,7 @@ class FriendshipTestCase(TestCase):
         ts2 = response.data['results'][2]['created_at']
         self.assertEqual(ts0 > ts1, True)
         self.assertEqual(ts1 > ts2, True)
+        print("\n", response.data, "\n")
         self.assertEqual(
             response.data['results'][0]['user']['username'],
             'user_b_following2'
