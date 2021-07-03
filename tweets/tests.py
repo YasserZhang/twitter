@@ -1,10 +1,13 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+
 
 # Create your tests here.
+from testing.testcases import TestCase
 from tweets.models import Tweet
+from utils.redis_client import RedisClient
+from utils.redis_serializers import DjangoModelSerializer
 from utils.time_helpers import utc_now
 
 
@@ -16,3 +19,19 @@ class TweetTests(TestCase):
         tweet.created_at = utc_now() - timedelta(hours=10)
         tweet.save()
         self.assertEqual(tweet.hours_to_now, 10)
+
+    def test_cache_tweet_in_redis(self):
+        tweet = self.create_tweet(self.user_a)
+        print("\ntweet: ", tweet)
+        conn = RedisClient.get_connection()
+        serialized_data = DjangoModelSerializer.serialize(tweet)
+        print("\nserialized_data: ", serialized_data)
+        conn.set(f'tweet:{tweet.id}', serialized_data)
+        data = conn.get(f'tweet:not_exists')
+        self.assertEqual(data, None)
+
+        data = conn.get(f'tweet:{tweet.id}')
+        print("data_before_deserialized:", data)
+        cached_tweet = DjangoModelSerializer.deserialize(data)
+        print("data_after_deserialized:", cached_tweet)
+        self.assertEqual(tweet, cached_tweet)
