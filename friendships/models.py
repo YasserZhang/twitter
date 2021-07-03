@@ -1,9 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
-# Create your models here.
-
-
+from utils.memcached_helper import MemcachedHelper
 
 class Friendship(models.Model):
     from_user = models.ForeignKey(
@@ -32,10 +29,8 @@ class Friendship(models.Model):
 
     @property
     def cached_from_user(self):
-        from accounts.services import UserService
-        return UserService.get_user_through_cache(self.from_user_id)
+        return MemcachedHelper.get_object_through_cache(User, self.from_user_id)
 
     @property
     def cached_to_user(self):
-        from accounts.services import UserService
-        return UserService.get_user_through_cache(self.to_user_id)
+        return MemcachedHelper.get_object_through_cache(User, self.to_user_id)
