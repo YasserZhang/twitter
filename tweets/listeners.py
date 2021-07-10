@@ -3,5 +3,4 @@ def push_tweet_to_cache(sender, instance, created, **kwargs):
         return
 
     from tweets.services import TweetService
-    print("\nlistener triggering caching.\n")
     TweetService.push_tweet_to_cache(instance)

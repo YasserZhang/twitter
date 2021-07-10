@@ -25,18 +25,14 @@ class TweetTests(TestCase):
 
     def test_cache_tweet_in_redis(self):
         tweet = self.create_tweet(self.user_a)
-        print("\ntweet: ", tweet)
         conn = RedisClient.get_connection()
         serialized_data = DjangoModelSerializer.serialize(tweet)
-        print("\nserialized_data: ", serialized_data)
         conn.set(f'tweet:{tweet.id}', serialized_data)
         data = conn.get(f'tweet:not_exists')
         self.assertEqual(data, None)
 
         data = conn.get(f'tweet:{tweet.id}')
-        print("data_before_deserialized:", data)
         cached_tweet = DjangoModelSerializer.deserialize(data)
-        print("data_after_deserialized:", cached_tweet)
         self.assertEqual(tweet, cached_tweet)
 
 class TweetServiceTests(TestCase):
@@ -59,8 +55,6 @@ class TweetServiceTests(TestCase):
         redis_conn = RedisClient.get_connection()
         key = USER_TWEETS_PATTERN.format(user_id=self.user_a.id)
         cached_objects = RedisHelper.load_objects_from_cache(redis_conn, key)
-        print("cached objects1: ")
-        print(cached_objects)
         self.assertEqual(len(cached_objects), 0)
 
         # cache hit
@@ -68,8 +62,6 @@ class TweetServiceTests(TestCase):
         print(tweets)
         self.assertEqual([t.id for t in tweets], tweet_ids)
         cached_objects = RedisHelper.load_objects_from_cache(redis_conn, key)
-        print("cached objects2: ")
-        print(cached_objects)
         self.assertEqual(len(cached_objects), 3)
 
 

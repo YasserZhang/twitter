@@ -48,9 +48,7 @@ class TweetViewSet(viewsets.GenericViewSet):
         """
         # load from redis cache, if not exist, retrieve from db and load them into redis cache
         tweets = TweetService.get_cached_tweets(user_id=request.query_params['user_id'])
-        print("listing tweets: ")
         tweets = self.paginate_queryset(tweets)
-        print(tweets)
         serializer = TweetSerializer(tweets, context={'request': request}, many=True)
         return self.get_paginated_response(serializer.data)
 
