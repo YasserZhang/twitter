@@ -42,12 +42,11 @@ class EndlessPagination(BasePagination):
                     break
             else:
                 reverse_ordered_list = []
-            self.has_next_page = len(reverse_ordered_list) > index + self.page_size
-            return reverse_ordered_list[index: index + self.page_size]
+        self.has_next_page = len(reverse_ordered_list) > index + self.page_size
+        return reverse_ordered_list[index: index + self.page_size]
 
     def paginate_queryset(self, queryset, request, view=None):
         if type(queryset) == list:
-            print("is a list..")
             return self.paginate_ordered_list(queryset, request)
         if 'created_at__gt' in request.query_params:
             created_at__gt = request.query_params['created_at__gt']

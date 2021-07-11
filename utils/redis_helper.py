@@ -22,7 +22,6 @@ class RedisHelper:
     def load_objects(cls, key, queryset):
         conn = RedisClient.get_connection()
         if conn.exists(key):
-            print("loading from cache...")
             return cls.load_objects_from_cache(conn, key)
         cls._load_objects_to_cache(key, queryset)
         return list(queryset)

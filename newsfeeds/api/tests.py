@@ -1,7 +1,12 @@
 from rest_framework.test import APIClient
 
+from newsfeeds.models import NewsFeed
 from testing.testcases import TestCase
+from tweets.models import Tweet
+from twitter.cache_constants import USER_NEWSFEED_PATTERN
 from utils.paginations import EndlessPagination
+from utils.redis_client import RedisClient
+from utils.redis_helper import RedisHelper
 
 NEWSFEED_URL = '/api/newsfeeds/'
 POST_TWEET_URL = '/api/tweets/'

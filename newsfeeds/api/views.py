@@ -7,6 +7,7 @@ from accounts.api.serializers import UserSerializer
 from friendships.models import Friendship
 from newsfeeds.api.serializers import NewsFeedSerializer
 from newsfeeds.models import NewsFeed
+from newsfeeds.services import NewsFeedService
 from utils.paginations import EndlessPagination
 
 
@@ -24,7 +25,7 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
     def list(self, request):
         #followers = Friendship.objects.filter(to_user=request.user['id'])
         # newsfeeds = NewsFeed.objects.filter(user=request.user)
-        newsfeeds = self.get_queryset()
+        newsfeeds = NewsFeedService.get_cached_newsfeeds(request.user.id)
         newsfeeds = self.paginate_queryset(newsfeeds)
         serializer = NewsFeedSerializer(
             newsfeeds,
