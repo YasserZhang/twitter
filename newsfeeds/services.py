@@ -1,6 +1,7 @@
-from friendships.api.serializers import FollowerSerializer
 from friendships.models import Friendship
 from newsfeeds.models import NewsFeed
+from twitter.cache_constants import USER_NEWSFEED_PATTERN
+from utils.redis_helper import RedisHelper
 
 
 class NewsFeedService(object):
@@ -11,6 +12,11 @@ class NewsFeedService(object):
         newsfeeds = [NewsFeed(user_id=follower.from_user_id, tweet=tweet) for follower in followers]
         newsfeeds.append(NewsFeed(user=tweet.user, tweet=tweet))
         NewsFeed.objects.bulk_create(newsfeeds)
+
+        # bulk create wont trigger post_sava signal, need to manually put newsfeeds into cache
+        for newsfeed in newsfeeds:
+            cls.push_newsfeed_to_cache(newsfeed)
+
 
     """
     another way to implement
@@ -33,3 +39,16 @@ class NewsFeedService(object):
     #     ]
     #     newsfeeds.append(NewsFeed(user=tweet.user, tweet=tweet))
     #     NewsFeed.objects.bulk_create(newsfeeds)
+
+    @classmethod
+    def get_cached_newsfeeds(cls, user_id):
+        queryset = NewsFeed.objects.filter(user_id = user_id).order_by("-created_at")
+        key = USER_NEWSFEED_PATTERN.format(user_id=user_id)
+        return RedisHelper.load_objects(key, queryset)
+
+    @classmethod
+    def push_newsfeed_to_cache(cls, newsfeed):
+        queryset = NewsFeed.objects.filter(user_id=newsfeed.user_id).order_by("-created_at")
+        key = USER_NEWSFEED_PATTERN.format(user_id=newsfeed.user_id)
+        RedisHelper.push_object(key, newsfeed, queryset)
+

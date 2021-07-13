@@ -1,10 +1,12 @@
+from datetime import datetime, timedelta
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APIClient
 
 from testing.testcases import TestCase
 from tweets.models import Tweet, TweetPhoto
 from utils.paginations import EndlessPagination
-
+from django.utils import timezone
 TWEET_LIST_API = '/api/tweets/'
 TWEET_CREATE_API = '/api/tweets/'
 TWEET_RETRIEVE_API = '/api/tweets/{}/'
@@ -26,11 +28,23 @@ class TweetApiTests(TestCase):
     def test_list_api(self):
         response = self.anonymous_client.get(TWEET_LIST_API)
         self.assertEqual(response.status_code, 400)
+        queryset = Tweet.objects.filter(user_id=self.user1.id)
+        for tweet in queryset:
+            print(tweet)
 
-        response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
+        t = timezone.now().astimezone(timezone.utc) # + timedelta(hours=10)
+        print(t)
+        response = self.anonymous_client.get(TWEET_LIST_API, {
+            'user_id': self.user1.id,
+            'created_at__lt': t # self.tweets1[-1].created_at,
+        })
         self.assertEqual(response.status_code, 200)
+        print(response.data)
         self.assertEqual(len(response.data['results']), 3)
-        response = self.anonymous_client.get(TWEET_LIST_API, {'user_id': self.user2.id})
+        response = self.anonymous_client.get(TWEET_LIST_API, {
+            'user_id': self.user2.id,
+            'created_at__lt': t
+        })
         self.assertEqual(len(response.data['results']), 2)
         # check the tweets are ordered by created_at desc
         self.assertEqual(response.data['results'][0]['id'], self.tweets2[1].id)
@@ -154,7 +168,10 @@ class TweetApiTests(TestCase):
 
         tweets = self.tweets1[::-1]
 
-        response = self.user1_client.get(TWEET_LIST_API, {'user_id': self.user1.id})
+        response = self.user1_client.get(TWEET_LIST_API, {
+            'user_id': self.user1.id,
+            'created_at__lt': timezone.now().astimezone(timezone.utc),
+        })
         self.assertEqual(response.data['has_next_page'], True)
         self.assertEqual(len(response.data['results']), page_size)
         self.assertEqual(response.data['results'][0]['id'], tweets[0].id)

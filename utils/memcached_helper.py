@@ -12,6 +12,9 @@ class MemcachedHelper:
 
     @classmethod
     def get_object_through_cache(cls, model_class, object_id):
+        """
+        memcached cache is used to cache a single object like tweet, and comment
+        """
         key = cls.get_key(model_class, object_id)
         # cache hit
         obj = cache.get(key)

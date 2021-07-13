@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from newsfeeds.services import NewsFeedService
 from tweets.api.serializers import TweetSerializerForCreate, TweetSerializer, TweetSerializerForDetail
 from tweets.models import Tweet
+from tweets.services import TweetService
 from utils.decorators import required_params
 from utils.paginations import EndlessPagination
 
@@ -45,9 +46,8 @@ class TweetViewSet(viewsets.GenericViewSet):
         """
         reload list method, must have user_id as filter condition
         """
-        tweets = Tweet.objects.filter(
-            user_id=request.query_params['user_id']
-        ).order_by('-created_at')
+        # load from redis cache, if not exist, retrieve from db and load them into redis cache
+        tweets = TweetService.get_cached_tweets(user_id=request.query_params['user_id'])
         tweets = self.paginate_queryset(tweets)
         serializer = TweetSerializer(tweets, context={'request': request}, many=True)
         return self.get_paginated_response(serializer.data)
