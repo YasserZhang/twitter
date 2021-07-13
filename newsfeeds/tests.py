@@ -1,7 +1,6 @@
 from newsfeeds.services import NewsFeedService
 from testing.testcases import TestCase
 from utils.redis_client import RedisClient
-from utils.redis_helper import RedisHelper
 
 
 class NewsFeedsServiceTests(TestCase):

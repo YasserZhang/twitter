@@ -1,4 +1,3 @@
-from friendships.api.serializers import FollowerSerializer
 from friendships.models import Friendship
 from newsfeeds.models import NewsFeed
 from twitter.cache_constants import USER_NEWSFEED_PATTERN

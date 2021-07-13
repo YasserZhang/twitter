@@ -1,10 +1,6 @@
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-from accounts.api.serializers import UserSerializer
-from friendships.models import Friendship
 from newsfeeds.api.serializers import NewsFeedSerializer
 from newsfeeds.models import NewsFeed
 from newsfeeds.services import NewsFeedService
