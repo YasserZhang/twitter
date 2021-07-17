@@ -2,6 +2,8 @@ from dateutil import parser
 from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
 
+from twitter import settings
+
 
 class EndlessPagination(BasePagination):
 
@@ -46,8 +48,6 @@ class EndlessPagination(BasePagination):
         return reverse_ordered_list[index: index + self.page_size]
 
     def paginate_queryset(self, queryset, request, view=None):
-        if type(queryset) == list:
-            return self.paginate_ordered_list(queryset, request)
         if 'created_at__gt' in request.query_params:
             created_at__gt = request.query_params['created_at__gt']
             queryset = queryset.filter(created_at__gt=created_at__gt)
@@ -60,3 +60,19 @@ class EndlessPagination(BasePagination):
         queryset = queryset.order_by('-created_at')[:self.page_size + 1]
         self.has_next_page = len(queryset) > self.page_size
         return queryset[:self.page_size]
+
+    def paginate_cached_list(self, cached_list, request):
+        paginated_list = self.paginate_ordered_list(cached_list, request)
+        # if requesting new data, just return what is retrieved
+        if 'created_at__gt' in request.query_params:
+            return paginated_list
+        # if requesting historical data, check if it has next page
+        if self.has_next_page:
+            return paginated_list
+        # if request historical data, and has no next page, check if the cached list is all we have
+        if len(cached_list) < settings.REDIS_LIST_LENGTH_LIMIT:
+            return paginated_list
+        # reaching here means user is requesting the last page of the cached list,
+        # and we know there might be more data beyond the cached data within the database
+        # so return None is telling the downstream process to fetch data from the database
+        return None

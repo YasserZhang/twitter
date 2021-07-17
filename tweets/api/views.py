@@ -47,9 +47,13 @@ class TweetViewSet(viewsets.GenericViewSet):
         reload list method, must have user_id as filter condition
         """
         # load from redis cache, if not exist, retrieve from db and load them into redis cache
-        tweets = TweetService.get_cached_tweets(user_id=request.query_params['user_id'])
-        tweets = self.paginate_queryset(tweets)
-        serializer = TweetSerializer(tweets, context={'request': request}, many=True)
+        user_id = request.query_params['user_id']
+        tweets = TweetService.get_cached_tweets(user_id=user_id)
+        page = self.paginator.paginate_cached_list(tweets, request)
+        if page is None:
+            queryset = Tweet.objects.filter(user_id=user_id).order_by('-created_at')
+            page = self.paginate_queryset(queryset)
+        serializer = TweetSerializer(page, context={'request': request}, many=True)
         return self.get_paginated_response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):

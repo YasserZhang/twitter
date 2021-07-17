@@ -22,9 +22,12 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         #followers = Friendship.objects.filter(to_user=request.user['id'])
         # newsfeeds = NewsFeed.objects.filter(user=request.user)
         newsfeeds = NewsFeedService.get_cached_newsfeeds(request.user.id)
-        newsfeeds = self.paginate_queryset(newsfeeds)
+        page = self.paginator.paginate_cached_list(newsfeeds, request)
+        if page is None:
+            newsfeeds = NewsFeed.objects.filter(user=request.user)
+            page = self.paginate_queryset(newsfeeds)
         serializer = NewsFeedSerializer(
-            newsfeeds,
+            page,
             context={'request': request},
             many=True)
         return self.get_paginated_response(serializer.data)
