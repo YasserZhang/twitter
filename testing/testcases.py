@@ -5,6 +5,7 @@ from django.test import TestCase as DjangoTestCase
 from rest_framework.test import APIClient
 
 from comments.models import Comment
+from friendships.models import Friendship
 from likes.models import Like
 from newsfeeds.models import NewsFeed
 from newsfeeds.services import NewsFeedService
@@ -29,6 +30,9 @@ class TestCase(DjangoTestCase):
         if password is None:
             password = 'generic passwor'
         return User.objects.create_user(username, email, password)
+
+    def create_friendship(self, from_user, to_user):
+        return Friendship.objects.create(from_user=from_user, to_user=to_user)
 
     def create_tweet(self, user, content=None):
         if content is None:
