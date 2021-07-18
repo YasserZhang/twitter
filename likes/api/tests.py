@@ -168,3 +168,20 @@ class LikeApiTest(TestCase):
         print("response:", response.data)
         self.assertEqual(response.data['comments'][0]['has_liked'], True)
         self.assertEqual(response.data['comments'][0]['likes_count'], 2)
+
+    def test_likes_count(self):
+        tweet = self.create_tweet(self.user_a)
+        data = {'content_type': 'tweet', 'object_id': tweet.id}
+        self.user_b_client.post(LIKE_BASE_URL, data)
+
+        tweet_url = TWEET_DETAIL_API.format(tweet.id)
+        response = self.user_a_client.get(tweet_url)
+        self.assertEqual(response.data['likes_count'], 1)
+        tweet.refresh_from_db()
+        self.assertEqual(tweet.likes_count, 1)
+
+        self.user_b_client.post(LIKE_CANCEL_URL, data)
+        tweet.refresh_from_db()
+        self.assertEqual(tweet.likes_count, 0)
+        response = self.user_a_client.get(tweet_url)
+        self.assertEqual(response.data['likes_count'], 0)
