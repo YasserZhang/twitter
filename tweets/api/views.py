@@ -63,7 +63,7 @@ class TweetViewSet(viewsets.GenericViewSet):
         if 'with_preview_comments' in request.query_params:
             return Response(TweetSerializerForDetail(tweet, context={'request': request}).data)
         serializer = TweetSerializer(
-            self.get_object(),
+            tweet,
             context={'request': request},
         )
         return Response(serializer.data)
