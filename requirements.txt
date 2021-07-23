@@ -8,3 +8,4 @@ boto3==1.16.36
 python-memcached==1.59
 redis==3.5.3
 python-dateutil==2.8.1
+celery==5.1.2
