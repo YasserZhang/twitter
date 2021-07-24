@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import sys
 
+from kombu import Queue
+
 try:
     from .local_settings import *
 except Exception as e:
@@ -190,3 +192,7 @@ CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2' if not TESTING else 'redis://127.
 CELERY_TIMEZONE = "UTC"
 CELERY_TASK_ALWAYS_EAGER = TESTING
 
+CELERY_QUEUES = (
+    Queue('default', routing_key='default'),
+    Queue('newsfeeds', routing_key='newsfeeds'),
+)

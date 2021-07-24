@@ -72,11 +72,9 @@ class RedisHelper:
 
     @classmethod
     def get_count(cls, obj, attr):
-        print("getting count from redis")
         conn = RedisClient.get_connection()
         key = cls.get_count_key(obj, attr)
         count = conn.get(key)
-        print("count: ", count, obj, attr)
         if count is not None:
             return int(count)
 

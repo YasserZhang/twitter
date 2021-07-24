@@ -127,7 +127,6 @@ class NewsFeedTestCase(TestCase):
 
     def test_redis_list_limit(self):
         list_limit = settings.REDIS_LIST_LENGTH_LIMIT
-        print("list_limit", list_limit)
         page_size = 20
         users = [self.create_user('user{}'.format(i)) for i in range(5)]
         newsfeeds = []

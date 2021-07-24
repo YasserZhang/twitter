@@ -41,6 +41,11 @@ class TestCase(DjangoTestCase):
         NewsFeedService.fanout_to_followers(tweet)
         return tweet
 
+    def create_tweet_without_fanout(self, user, content=None):
+        if content is None:
+            content = 'default tweet content'
+        return Tweet.objects.create(user=user, content=content)
+
     def create_comment(self, user, tweet_id, content=None):
         if content is None:
             content = 'default comment'
