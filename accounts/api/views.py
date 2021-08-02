@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -50,6 +52,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = SignupSerializer
 
     @action(methods=['POST'], detail=False)
+    @method_decorator(ratelimit(key='ip', rate='3/s', method='POST', block=True))
     def signup(self, request):
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
@@ -68,6 +71,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         }, status=201)
 
     @action(methods=['GET'], detail=False)
+    @method_decorator(ratelimit(key='user', rate='3/s', method='GET', block=True))
     def login_status(self, request):
         print(request)
         print(request.user)
@@ -78,11 +82,13 @@ class AccountViewSet(viewsets.ModelViewSet):
         return Response(data)
 
     @action(methods=['POST'], detail=False)
+    @method_decorator(ratelimit(key='ip', rate='3/s', method='POST', block=True))
     def logout(self, request):
         django_logout(request)
         return Response({'success': True})
 
     @action(methods=['POST'], detail=False)
+    @method_decorator(ratelimit(key='ip', rate='3/s', method='POST', block=True))
     def login(self, request):
         # to validate user data
         print(dir(request))

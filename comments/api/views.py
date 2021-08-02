@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -22,6 +24,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             return [IsAuthenticated(), IsObjectOwner()]
         return [AllowAny()]
 
+    @method_decorator(ratelimit(key='user', rate='3/s', method='POST', block=True))
     def create(self, request, *args, **kwargs):
         data = {
             'user_id': request.user.id,
@@ -41,6 +44,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    @method_decorator(ratelimit(key='user', rate='3/s', method='POST', block=True))
     def update(self, request, *args, **kwargs):
         serializer = CommentSerializerForUpdate(
             instance=self.get_object(),
@@ -56,12 +60,14 @@ class CommentViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @method_decorator(ratelimit(key='user', rate='3/s', method='POST', block=True))
     def destroy(self, request, *args, **kwargs):
         comment = self.get_object()
         comment.delete()
         return Response({'success': True}, status=status.HTTP_200_OK)
 
     @required_params(params=['tweet_id'])
+    @method_decorator(ratelimit(key='user', rate='3/s', method='GET', block=True))
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         comments = self.filter_queryset(queryset).order_by('created_at')

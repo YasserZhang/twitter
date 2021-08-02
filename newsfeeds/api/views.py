@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from ratelimit.decorators import ratelimit
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -18,6 +20,7 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         # print(self.request.user)
         return NewsFeed.objects.filter(user=self.request.user)
 
+    @method_decorator(ratelimit(key='user', rate='5/s', method='GET', block=True))
     def list(self, request):
         #followers = Friendship.objects.filter(to_user=request.user['id'])
         # newsfeeds = NewsFeed.objects.filter(user=request.user)

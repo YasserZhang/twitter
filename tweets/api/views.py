@@ -1,7 +1,8 @@
+from django.utils.decorators import method_decorator
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
+from ratelimit.decorators import ratelimit
 from newsfeeds.services import NewsFeedService
 from tweets.api.serializers import TweetSerializerForCreate, TweetSerializer, TweetSerializerForDetail
 from tweets.models import Tweet
@@ -23,6 +24,8 @@ class TweetViewSet(viewsets.GenericViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
+    @method_decorator(ratelimit(key='user', rate='1/s', method='POST', block=True))
+    @method_decorator(ratelimit(key='user', rate='5/m', method='POST', block=True))
     def create(self, request, *args, **kwargs):
         """
         reload create method, because need to use request.user as tweet user
@@ -56,6 +59,7 @@ class TweetViewSet(viewsets.GenericViewSet):
         serializer = TweetSerializer(page, context={'request': request}, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @method_decorator(ratelimit(key='user_or_ip', rate='5/s', method='GET', block=True))
     def retrieve(self, request, *args, **kwargs):
         tweet = self.get_object()
         if 'with_all_comments' in request.query_params:
